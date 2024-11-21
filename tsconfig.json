@@ -6,10 +6,10 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "ES2021",
+    "target": "ESNext",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./",
+    "baseUrl": "./src",
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": false,
@@ -18,7 +18,7 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "moduleResolution": "node",
-    "esModuleInterop": true
+    "esModuleInterop": true,
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]

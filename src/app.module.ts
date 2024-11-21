@@ -7,6 +7,9 @@ import { SeederModule } from './books/seeder/seeder.module';
 import { UsersModule } from './users/users.module';
 import { RentalsModule } from './rentals/rentals.module';
 import { TestModule } from './test/test.module';
+import { Book } from 'books/entities/book.entity';
+import { Rental } from 'rentals/rentals.entities/rentals.entities';
+import { User } from 'users/entities/users.entities';
 
 @Module({
   imports: [
@@ -17,12 +20,14 @@ import { TestModule } from './test/test.module';
       username: 'postgres',
       password: '12345678',
       database: 'postgres',
-      entities: [__dirname + '/../**/*.entity.{js,ts}'],
+      entities: [Book, Rental, User],
       synchronize: true,
     }),
+    TypeOrmModule.forFeature([Book, Rental, User]),
     SeederModule,
     UsersModule,
     RentalsModule,
+    BooksModule,
     TestModule,
   ],
   controllers: [AppController],

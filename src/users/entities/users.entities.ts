@@ -1,4 +1,4 @@
-import { Rental } from 'src/rentals/rentals.entities/rentals.entities';
+import { Rental } from 'rentals/rentals.entities/rentals.entities';
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 
 

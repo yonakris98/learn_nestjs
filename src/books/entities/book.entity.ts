@@ -1,6 +1,6 @@
 //TypeORM entity for Books table
 
-import { Rental } from 'src/rentals/rentals.entities/rentals.entities';
+import { Rental } from 'rentals/rentals.entities/rentals.entities';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
 @Entity('books')

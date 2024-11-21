@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { SeederModuleService } from './seeder.module/seeder.module.service';
 import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Rental } from 'src/rentals/rentals.entities/rentals.entities';
+import { Rental } from 'rentals/rentals.entities/rentals.entities';
 
 enum CardinalDirections {
   North,

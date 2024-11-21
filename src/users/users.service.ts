@@ -3,29 +3,46 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/users.entities';
 import { Repository } from 'typeorm';
 
+/*
+GetUsersFilterDto: This is a simple interface that defines the optional query parameters status and name that can be used to filter the results.
+getUsers method:
+
+This method takes the filters object, which contains status and name.
+
+It uses TypeORM's createQueryBuilder to construct a dynamic query.
+
+If status is provided, it filters by status.
+
+If name is provided, it filters by name using a LIKE query to allow partial matches.
+
+Finally, it executes the query using getMany() to return an array of users that match the filters.
+*/
+
+interface GetUsersFilterDto {
+  status?: string;
+  name?: string;
+}
+
 @Injectable()
 export class UsersService {
-  getUsers(arg0: { status: string; name: string; }) {
-      throw new Error('Method not implemented.');
-  }
   constructor(
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    private userRepository: Repository<User>,
   ) {}
 
-  async getAllUsers(filter: { status?: string; name?: string }) {
-    const query = this.userRepository.createQueryBuilder('user');
+  async getUsers(filters: GetUsersFilterDto): Promise<User[]> {
+    const { status, name } = filters;
 
-    if (filter.status) {
-      query.andWhere('user.status = :status', { status: filter.status });
+    const queryBuilder = this.userRepository.createQueryBuilder('user');
+
+    if (status) {
+      queryBuilder.andWhere('user.status = :status', { status });
     }
 
-    if (filter.name) {
-      query.andWhere('user.name = :name', { name: filter.name });
+    if (name) {
+      queryBuilder.andWhere('user.name LIKE :name', { name: `%${name}%` });
     }
 
-    query.orderBy('user.id', 'ASC');
-
-    return query.getMany();
+    return await queryBuilder.getMany();
   }
 }
