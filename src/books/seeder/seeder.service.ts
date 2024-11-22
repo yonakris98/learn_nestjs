@@ -1,6 +1,6 @@
 //Seeder for populating books
 
-  /* 
+/* 
   Constructor:
     The constructor is a special method in a class that gets called when an instance of the class is created. In this case, it initializes the service with the Book repository.
 
@@ -16,17 +16,23 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Book } from '../entities/book.entity';
+import { Book } from 'books/entities/book.entity';
+import { User } from 'users/entities/users.entities';
+import { Rental } from 'rentals/rentals.entities/rentals.entities';
 
 @Injectable()
 export class SeederService {
   constructor(
     @InjectRepository(Book)
     private readonly bookRepository: Repository<Book>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    @InjectRepository(Rental)
+    private readonly rentalRepository: Repository<Rental>,
   ) {}
 
   async seed(): Promise<void> {
-    // Data awal untuk tabel Books
+    // Seed books
     const books = [
       {
         title: 'The Great Gatsby',
@@ -49,8 +55,35 @@ export class SeederService {
       },
     ];
 
+    const users: Partial<User>[] = [
+      {
+        name: 'John Doe',
+        email: 'john.doe@example.com',
+        status: 'active',
+      },
+      {
+        name: 'Jane Smith',
+        email: 'jane.smith@example.com',
+        status: 'inactive',
+      },
+      {
+        name: 'Alice Johnson',
+        email: 'alice.johnson@example.com',
+        status: 'active',
+      },
+      {
+        name: 'Bob Brown',
+        email: 'bob.brown@example.com',
+        status: 'inactive',
+      },
+      {
+        name: 'Charlie Davis',
+        email: 'charlie.davis@example.com',
+        status: 'active',
+      },
+    ];
+
     for (const book of books) {
-      // Cek apakah buku sudah ada
       const existingBook = await this.bookRepository.findOne({
         where: { title: book.title },
       });
@@ -59,6 +92,63 @@ export class SeederService {
       }
     }
 
-    console.log('Books seeding completed!');
+    for (const user of users) {
+      const existingUser = await this.userRepository.findOne({
+        where: { name: user.name },
+      });
+      if (!existingUser) {
+        await this.userRepository.save(user);
+      }
+    }
+
+    const rentalData = [
+      {
+        userName: 'John Doe',
+        bookTitle: 'The Great Gatsby',
+        rentalDate: new Date('2024-01-01T10:00:00Z'),
+        returnDate: new Date('2024-01-08T10:00:00Z'),
+      },
+      {
+        userName: 'Jane Smith',
+        bookTitle: 'To Kill a Mockingbird',
+        rentalDate: new Date('2024-02-01T14:00:00Z'),
+        returnDate: new Date('2024-02-07T14:00:00Z'),
+      },
+      {
+        userName: 'Alice Johnson',
+        bookTitle: '1984',
+        rentalDate: new Date('2024-03-01T09:30:00Z'),
+        returnDate: new Date('2024-03-06T09:30:00Z'),
+      },
+    ];
+
+    for (const rental of rentalData) {
+      const user = await this.userRepository.findOne({
+        where: { name: rental.userName },
+      });
+      const book = await this.bookRepository.findOne({
+        where: { title: rental.bookTitle },
+      });
+
+      if (user && book) {
+        const existingRental = await this.rentalRepository.findOne({
+          where: {
+            user: { id: user.id },
+            book: { id: book.id },
+          },
+        });
+
+        if (!existingRental) {
+          await this.rentalRepository.save({
+            user,
+            book,
+            rental_date: rental.rentalDate,
+            return_date: rental.returnDate,
+          });
+        }
+      }
+    }
+
+    console.log('Seeding completed for Books, Users, and Rentals!');
   }
 }

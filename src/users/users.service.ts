@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/users.entities';
 import { Repository } from 'typeorm';
+import { CreateUserDto } from './dto/create-user-dto';
 
 /*
 GetUsersFilterDto: This is a simple interface that defines the optional query parameters status and name that can be used to filter the results.
@@ -44,5 +45,37 @@ export class UsersService {
     }
 
     return await queryBuilder.getMany();
+  }
+
+  async getUserWithRentals(userId: number) {
+    return this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['rentals'], // nama di @Entity
+    });
+  }
+
+  async addUser(createUserDto: CreateUserDto): Promise<User> { // Promise = future
+    const existingUser = await this.userRepository.findOne({
+      where: { email: createUserDto.email },
+    }); //check duplicate
+  
+    if (existingUser) {
+      throw new Error('User with this email already exists');
+    }
+  
+    const user = this.userRepository.create(createUserDto);
+    return this.userRepository.save(user); // if user exist update, not exist insert
+  }
+  
+
+  async editUser(createUserDto: CreateUserDto, id: number): Promise<User> {
+    const user = await this.userRepository.findOneBy({id});
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    
+    Object.assign(user,createUserDto);
+    return this.userRepository.save(user);
   }
 }
