@@ -1,9 +1,15 @@
 // Service for business logic
 
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Book } from './entities/book.entity';
-import { QueryBuilder, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+import { User } from 'users/entities/users.entities';
+import { Rental } from 'rentals/rentals.entities/rentals.entities';
 
 @Injectable()
 export class BooksService {

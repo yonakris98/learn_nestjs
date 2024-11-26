@@ -1,6 +1,6 @@
 //Controller for handling requests
 
-import { Controller, Get, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { BooksService } from './books.service';
 
 @Controller('books')

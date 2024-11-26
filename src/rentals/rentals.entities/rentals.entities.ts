@@ -1,6 +1,12 @@
 import { Book } from 'books/entities/book.entity';
 import { User } from 'users/entities/users.entities';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 
 /* 
 
@@ -22,9 +28,11 @@ export class Rental {
   id: number;
 
   @ManyToOne(() => User, (user) => user.rentals, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'user_id' })
   user: User;
 
   @ManyToOne(() => Book, (book) => book.rentals, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'book_id' })
   book: Book;
 
   @Column({ type: 'timestamp' })
@@ -32,4 +40,7 @@ export class Rental {
 
   @Column({ type: 'timestamp', nullable: true })
   return_date: Date;
+
+  @Column({ type: 'timestamp' })
+  due_date: Date;
 }

@@ -1,8 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/users.entities';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user-dto';
+import { Rental } from 'rentals/rentals.entities/rentals.entities';
 
 /*
 GetUsersFilterDto: This is a simple interface that defines the optional query parameters status and name that can be used to filter the results.
@@ -29,6 +30,8 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(Rental)
+    private rentalRepository: Repository<Rental>,
   ) {}
 
   async getUsers(filters: GetUsersFilterDto): Promise<User[]> {
@@ -48,34 +51,36 @@ export class UsersService {
   }
 
   async getUserWithRentals(userId: number) {
-    return this.userRepository.findOne({
+    const userDetail = this.userRepository.findOne({
       where: { id: userId },
       relations: ['rentals'], // nama di @Entity
     });
+    Logger.log(`User detail: ${JSON.stringify(userDetail)}`);
+    return userDetail;
   }
 
-  async addUser(createUserDto: CreateUserDto): Promise<User> { // Promise = future
+  async addUser(createUserDto: CreateUserDto): Promise<User> {
+    // Promise = future
     const existingUser = await this.userRepository.findOne({
       where: { email: createUserDto.email },
     }); //check duplicate
-  
+
     if (existingUser) {
       throw new Error('User with this email already exists');
     }
-  
+
     const user = this.userRepository.create(createUserDto);
     return this.userRepository.save(user); // if user exist update, not exist insert
   }
-  
 
   async editUser(createUserDto: CreateUserDto, id: number): Promise<User> {
-    const user = await this.userRepository.findOneBy({id});
+    const user = await this.userRepository.findOneBy({ id });
 
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
-    
-    Object.assign(user,createUserDto);
+
+    Object.assign(user, createUserDto);
     return this.userRepository.save(user);
   }
 }
